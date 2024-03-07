@@ -13,10 +13,10 @@ export const Meme: React.FC<MemeProps> = ({ meme }) => {
   return (
     <div>
       <Image
-        src={meme.imageUrl || "/reddit-logo.svg"}
-        alt={meme.name || "Meme"}
-        width={500}
-        height={500}
+        src={meme.imageUrl}
+        alt={meme.name}
+        width={200}
+        height={200}
         layout="responsive"
       />
     </div>

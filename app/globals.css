@@ -31,3 +31,14 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Add this to globals.css or a new CSS module for LayoutGrid */
+.meme-image-container {
+  background-color: #fff; /* Light background to ensure visibility */
+  border-radius: 8px; /* Optional styling */
+  overflow: hidden; /* To maintain boundary for absolutely positioned child elements */
+}
+
+.meme-image-container img {
+  display: block; /* To prevent any unexpected collapsing or spacing */
+}

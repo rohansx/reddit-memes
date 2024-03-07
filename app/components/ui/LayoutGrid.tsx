@@ -1,13 +1,11 @@
 "use client";
-import React from "react";
-import { motion } from "framer-motion";
+
+import React, { useState } from "react";
 import Image from "next/image";
-import { cn } from "@/app/utils/cn"; // Assuming cn function is correctly imported
+import { motion } from "framer-motion";
 
 type Card = {
   id: string | number;
-  content: JSX.Element | React.ReactNode | string;
-  className?: string;
   thumbnail: string;
 };
 
@@ -15,102 +13,48 @@ interface LayoutGridProps {
   items: Card[];
 }
 
-export const LayoutGrid: React.FC<LayoutGridProps> = ({ items }) => {
-  const [selected, setSelected] = React.useState<Card | null>(null);
-  const [lastSelected, setLastSelected] = React.useState<Card | null>(null);
-
-  const handleClick = (card: Card) => {
-    setLastSelected(selected);
-    setSelected(card);
-  };
-
-  const handleOutsideClick = () => {
-    setLastSelected(selected);
-    setSelected(null);
-  };
-
-  return (
-    <div className="w-full h-full p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-4">
-      {items.map((card, i) => (
-        <div key={i} className={card.className || ""}>
-          <motion.div
-            onClick={() => handleClick(card)}
-            className={cn(
-              "relative overflow-hidden",
-              selected?.id === card.id
-                ? "rounded-lg cursor-pointer absolute inset-0 h-1/2 w-full md:w-1/2 m-auto z-50 flex justify-center items-center flex-wrap flex-col"
-                : lastSelected?.id === card.id
-                ? "z-40 bg-white rounded-xl h-full w-full"
-                : "bg-white rounded-xl h-full w-full",
-              card.className || ""
-            )}
-            layout
-          >
-            {selected?.id === card.id && <SelectedCard selected={selected} />}
-            <BlurImage card={card} />
-          </motion.div>
-        </div>
-      ))}
-      <motion.div
-        onClick={handleOutsideClick}
-        className={cn(
-          "absolute h-full w-full left-0 top-0 bg-black opacity-0 z-10",
-          selected ? "pointer-events-auto" : "pointer-events-none"
-        )}
-        animate={{ opacity: selected ? 0.3 : 0 }}
-      />
-    </div>
-  );
-};
-
-const BlurImage = ({ card }: { card: Card }) => {
-  const [loaded, setLoaded] = React.useState(false);
+const BlurImage = ({
+  card,
+  isSelected,
+}: {
+  card: Card;
+  isSelected: boolean;
+}) => {
   return (
     <Image
       src={card.thumbnail}
-      height="500"
-      width="500"
-      onLoad={() => setLoaded(true)}
-      className={cn(
-        "object-cover object-top absolute inset-0 h-full w-full transition duration-200",
-        loaded ? "blur-none" : "blur-md"
-      )}
-      alt="thumbnail"
+      alt="Meme"
+      layout="fill"
+      objectFit=""
+      className={`${isSelected ? "" : "grayscale"}`}
     />
   );
 };
 
-const SelectedCard = ({ selected }: { selected: Card | null }) => {
-  if (!selected) return null;
+export const LayoutGrid: React.FC<LayoutGridProps> = ({ items }) => {
+  const [selectedId, setSelectedId] = useState<null | string | number>(null);
 
   return (
-    <div className="bg-transparent h-full w-full flex flex-col justify-end rounded-lg shadow-2xl relative z-[60]">
-      <motion.div
-        initial={{
-          opacity: 0,
-        }}
-        animate={{
-          opacity: 0.6,
-        }}
-        className="absolute inset-0 h-full w-full bg-black opacity-60 z-10"
-      />
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 100,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          duration: 0.3,
-          ease: "easeInOut",
-        }}
-        className="relative px-8 pb-4 z-[70]"
-      >
-        {selected.content}
-      </motion.div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 p-16">
+      {items.map((card) => (
+        <motion.div
+          key={card.id}
+          layout
+          initial={{ opacity: 0.8 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className={`relative bg-white p-2 rounded-lg shadow-lg cursor-pointer hover:shadow-xl transition-all m-2 overflow-hidden`}
+          style={{
+            aspectRatio: 8 / 8,
+            scale: selectedId === card.id ? 1.1 : 1,
+            zIndex: selectedId === card.id ? 1 : 0,
+            filter: selectedId === card.id ? "none" : "blur(4px)",
+          }}
+          onClick={() => setSelectedId(selectedId === card.id ? null : card.id)}
+        >
+          <BlurImage card={card} isSelected={selectedId === card.id} />
+        </motion.div>
+      ))}
     </div>
   );
 };
